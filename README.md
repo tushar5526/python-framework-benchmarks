@@ -19,7 +19,7 @@ pip install -r requirements.txt
 python benchmark.py
 ```
 
-You can also use the `Makefile` to manually run benchmarks.
+Benchmark results are stored in the `results` folder. You can also use the `Makefile` to manually run benchmarks.
 
 Important Note
 --------------
