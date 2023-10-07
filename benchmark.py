@@ -5,9 +5,12 @@ import requests
 import socket
 
 from rich import print
+from rich.table import Table
+
 
 RESULT_DIR = "results"
 SERVERS_DIR = "servers"
+results = []
 
 os.makedirs(RESULT_DIR, exist_ok=True)
 
@@ -19,7 +22,9 @@ def wait_for_server(framework):
             print(f"[bold green]✔️ {framework} server started[/bold green] :rocket:")
             break
         except requests.exceptions.ConnectionError:
-            print(f"[yellow]⏳ Waiting for [bold]{framework} server[/bold] to start...[/yellow]")
+            print(
+                f"[yellow]⏳ Waiting for [bold]{framework} server[/bold] to start...[/yellow]"
+            )
 
         time.sleep(1)
 
@@ -51,21 +56,43 @@ def kill_server(server_process, framework):
     server_process.terminate()
 
 
-def run_wkr_and_write_results(framework):
+def run_wkr(framework):
     command = "make benchmark"
     print(f"[cyan]🚀 [bold]Running wrk for {framework}[/bold] 🚀[/cyan]")
-    result = subprocess.run(command, shell=True, text=True, stdout=subprocess.PIPE)
-    output_file_path = os.path.join(RESULT_DIR, f"{framework}.txt")
+    return subprocess.run(command, shell=True, text=True, stdout=subprocess.PIPE)
 
-    print(f"[cyan]📝 [bold]Writing benchmark results for {framework}[/bold] 📝[/cyan]")
-    with open(output_file_path, "w") as file:
-        file.write(result.stdout)
+
+def write_and_add_results(benchmark_result, framework):
+    stdout_text = benchmark_result.stdout
+    output_file_path = os.path.join(RESULT_DIR, f"{framework}.txt")
+    with open(output_file_path, "w") as f:
+        f.write(stdout_text)
+
+    # Extract relevant data from the 'wrk' result and store it
+    result_lines = stdout_text.strip().split("\n")
+    result_data = {}
+
+    for line in result_lines:
+        parts = line.strip().split(": ")
+        if len(parts) == 2:
+            key, value = parts
+            result_data[key] = value
+
+    # Append the result data to the results list
+    results.append(
+        {
+            "Framework": framework,
+            "Requests/sec": result_data.get("Requests/sec", 0),
+            "Transfer/sec": result_data.get("Transfer/sec", 0),
+        }
+    )
 
 
 def load_test(framework):
     server_process = start_server(framework)
-    run_wkr_and_write_results(framework)
+    benchmark_result = run_wkr(framework)
     kill_server(server_process, framework)
+    write_and_add_results(benchmark_result, framework)
 
 
 def get_framework_names():
@@ -73,5 +100,24 @@ def get_framework_names():
 
 
 if __name__ == "__main__":
-    for framework in get_framework_names():
-        load_test(framework)
+    for framework_name in get_framework_names():
+        load_test(framework_name)
+
+    # Create a rich Table to display the results
+    table = Table(title="Benchmark Results using wrk with 12 threads and 400 connections for 10s")
+    table.add_column("Framework", style="bold green")
+    table.add_column("Requests/sec", style="bold blue")
+    table.add_column("Transfer/sec", style="bold blue")
+
+    results.sort(key=lambda x: x["Requests/sec"], reverse=True)
+    # Add data to the table
+    for result in results:
+        table.add_row(
+            f"[bold]{result['Framework']}[/bold]",  # Apply style to Framework column values
+            result["Requests/sec"],
+            result["Transfer/sec"],
+        )
+
+    # Print the table using rich
+    print()
+    print(table)

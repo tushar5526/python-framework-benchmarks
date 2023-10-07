@@ -2,9 +2,9 @@ wrk -t12 -c400 -d10s -s wrk_script.lua http://localhost:8000/echo
 Running 10s test @ http://localhost:8000/echo
   12 threads and 400 connections
   Thread Stats   Avg      Stdev     Max   +/- Stdev
-    Latency    72.39ms   96.33ms 880.50ms   85.32%
-    Req/Sec     0.87k   184.48     1.50k    69.25%
-  103661 requests in 10.03s, 17.60MB read
-  Socket errors: connect 0, read 703, write 64, timeout 0
-Requests/sec:  10339.28
-Transfer/sec:      1.76MB
+    Latency    73.64ms   99.58ms 919.86ms   85.78%
+    Req/Sec     0.86k   185.15     1.54k    66.42%
+  102608 requests in 10.02s, 17.42MB read
+  Socket errors: connect 0, read 635, write 13, timeout 0
+Requests/sec:  10235.36
+Transfer/sec:      1.74MB
