@@ -3,7 +3,6 @@
 A repository to do simple "echo server" benchmarks for famous ASGI and WSGI python frameworks
 
 ## How to Run Benchmarks 🛠️
-------------------------
 
 1. Install dependencies
 
