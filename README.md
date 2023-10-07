@@ -6,7 +6,7 @@ A repository to do simple "echo server" benchmarks for famous ASGI and WSGI pyth
 
 1. Install dependencies
 
-```
+```bash
 python -m venv venv
 source venv/bin/activate
 
@@ -15,7 +15,7 @@ pip install -r requirements.txt
 
 2. Run benchmark script
 
-```
+```bash
 python benchmark.py
 ```
 
