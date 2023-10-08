@@ -10,7 +10,7 @@ quart:
 	uvicorn servers.quart.main:app --host 0.0.0.0 --port 8000 --workers 16
 
 robyn:
-	python servers/robyn/main.py --processes 16 --workers 16
+	python servers/robyn/main.py --processes 16 --workers 16 --log-level=WARN
 
 sanic:
 	uvicorn servers.sanic.main:app --host 0.0.0.0 --port 8000 --workers 16
